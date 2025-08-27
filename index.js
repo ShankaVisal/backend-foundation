@@ -7,14 +7,16 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
+
 dotenv.config();
+
 const app = express();
 
 app.use(bodyParser.json());
 
 app.use(cookieParser());
 
-const connectionString = "mongodb+srv://shankavisal:shankavisal@cluster0.jgxuh9e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const connectionString = process.env.mongoDB_URL;;
 
 
 app.use((req,res, next)=>{

@@ -2,6 +2,7 @@ import { set } from 'mongoose';
 import User from '../models/user.js';
 import jwt, { decode } from 'jsonwebtoken';
 
+
 export function getUser(req, res){
     User.find().then(
         (userList)=>{
@@ -82,10 +83,10 @@ export function loginUser(req,res){
                 }
 
                 // Access Token (short-lived)
-                const token = jwt.sign(payload,"This-is-my-secrete-key",{expiresIn:"1m"});
+                const token = jwt.sign(payload,process.env.access_secrete_key,{expiresIn:"1m"});
 
                 // Refresh Token (long-lived)
-                const refreshToken = jwt.sign(payload, "This-is-my-refresh-secrete-key", {expiresIn:"30m"});
+                const refreshToken = jwt.sign(payload, process.env.refresh_secrete_key, {expiresIn:"30m"});
 
                 // You should save refreshToken in DB or Redis for production
                 // For demo, sending back directly
@@ -119,7 +120,7 @@ export function refresh (req,ref){
         });
     }
 
-    jwt.verify(refreshToken, "This-is-my-refresh-secrete-key", (err, decoded) => {
+    jwt.verify(refreshToken, process.env.refresh_secrete_key, (err, decoded) => {
         if(err){
             return res.status(403).json({
                 message: "Invalid Refresh Token"
