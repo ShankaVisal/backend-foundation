@@ -6,6 +6,9 @@ import galleryItem from './routes/galleryItemRoute.js';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import multer from 'multer';
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
 
 
 dotenv.config();
@@ -16,8 +19,7 @@ app.use(bodyParser.json());
 
 app.use(cookieParser());
 
-const connectionString = process.env.mongoDB_URL;;
-
+const connectionString = process.env.mongoDB_URL;
 
 app.use((req,res, next)=>{
     const token = req.header('Authorization')?.replace('Bearer ', '')
@@ -72,4 +74,42 @@ app.post('/', (req,res)=>{
 
 app.listen(3000,(req,res) => {
     console.log('server is running on port 3000');
+})
+
+// Fix __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, "uploads")); // make sure 'uploads' exists
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)); 
+    }
+});
+
+const upload = multer({ storage });
+
+app.post('/upload', upload.single('file'), (req, res) => {
+    res.json({
+        message: 'File uploaded successfully',
+        filename: req.file.filename,
+        path: `/uploads/${req.file.filename}`
+    });
+});
+
+
+app.get('/download/:filename', (req,res) => {
+    const filename = req.params.filename;
+    const filepath = '/uploads/' + filename;
+    res.download(filepath, (err) => {
+        if(err){
+            res.status(500).json({
+                message: "File download failed",
+                error: err.message
+            })
+        }
+    })
 })
