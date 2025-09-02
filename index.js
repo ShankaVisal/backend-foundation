@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
+import fileRouter from './routes/fileRoute.js';
 
 
 dotenv.config();
@@ -61,6 +62,7 @@ mongoose.connect(connectionString).then(
 
 app.use('/api/users/', userRouter);
 app.use('/api/gallery/', galleryItem);
+app.use('/api/file/',fileRouter);
 
 app.post('/', (req,res)=>{
     const name = req.body.name;
@@ -75,6 +77,8 @@ app.post('/', (req,res)=>{
 app.listen(3000,(req,res) => {
     console.log('server is running on port 3000');
 })
+
+
 
 // Fix __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
