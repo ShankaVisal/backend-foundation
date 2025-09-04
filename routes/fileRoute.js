@@ -1,8 +1,12 @@
 import express from "express";
-import { upload, uploadFile } from "../controllers/fileController.js";
+import { downloadFile, upload, uploadFile } from "../controllers/fileController.js";
 
 const fileRouter = express.Router();
 
-fileRouter.post('/upload',upload, uploadFile);
+// Single file upload
+// 'file' should match the field name in the form-data
+fileRouter.post('/upload', upload.single('file'), uploadFile);
+
+fileRouter.get('/download/:filename', downloadFile);
 
 export default fileRouter;
